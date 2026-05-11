@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>광명역세권 마일 모달 4종</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" rel="stylesheet" />
+<style>
+  /* Pretendard GOV Variable — government distribution alias of Pretendard Variable */
+  @font-face {
+    font-family: 'Pretendard GOV Variable';
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+    src: local('Pretendard GOV Variable'), local('Pretendard Variable');
+  }
+</style>
+<style>
+  :root {
+    --bg-page: #E5E7EB;
+    --hairline: #ECEEF2;
+    --grid: #EEF1F5;
+    --text-900: #1A1A1A;
+    --text-700: #333;
+    --text-500: #6B7280;
+    --text-400: #9AA1AC;
+    --text-300: #C5C9D1;
+    --modal-w: 470px;
+    --modal-h: 450px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard GOV Variable', 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--text-900);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .stage-wrap {
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background: #C9CDD3;
+    position: relative;
+  }
+  .stage {
+    width: 1920px; height: 1080px;
+    background: var(--bg-page);
+    position: absolute; left: 0; top: 0;
+    transform-origin: top left;
+  }
+  .grid-2x2 {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    grid-template-columns: var(--modal-w) var(--modal-w);
+    grid-template-rows: var(--modal-h) var(--modal-h);
+    gap: 30px;
+  }
+
+  /* ==================== MODAL SHELL ==================== */
+  .modal {
+    width: var(--modal-w);
+    height: var(--modal-h);
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 30px 60px -20px rgba(15,30,70,.18), 0 10px 24px -10px rgba(15,30,70,.10);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  /* color tokens per modal */
+  .modal[data-color="blue"]   { --c: #0C8AE5; --c-strong: #0070C2; --c-soft: #E5F2FB; --c-soft2: #D9EBF8; }
+  .modal[data-color="green"]  { --c: #06A85B; --c-strong: #048045; --c-soft: #E0F4E9; --c-soft2: #D2EFDF; }
+  .modal[data-color="orange"] { --c: #EC8913; --c-strong: #C56F08; --c-soft: #FCEFE0; --c-soft2: #FCE5CC; }
+  .modal[data-color="purple"] { --c: #636CCC; --c-strong: #4D55B0; --c-soft: #ECEDF7; --c-soft2: #DFE1F2; }
+
+  .m-header {
+    padding: 20px 22px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .m-logo {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--c) 70%, white), var(--c));
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 14px -4px color-mix(in srgb, var(--c) 50%, transparent);
+  }
+  .m-titlewrap { flex: 1; min-width: 0; }
+  .m-title {
+    font-size: 19px; font-weight: 700; line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: var(--c);
+  }
+  .m-subtitle {
+    margin-top: 4px;
+    font-size: 13px; font-weight: 400;
+    color: var(--text-500);
+    letter-spacing: -0.2px;
+  }
+  .m-controls { display: flex; align-items: center; gap: 8px; padding-top: 4px; }
+  .m-dots { display: flex; align-items: center; gap: 4px; }
+  .m-dot {
+    width: 6px; height: 6px;
+    border-radius: 999px;
+    background: #D7DCE3;
+    border: none; padding: 0; cursor: pointer;
+    transition: width .35s ease, background .35s ease;
+  }
+  .m-dot:hover { background: #B8BFC8; }
+  .m-dot.active { width: 18px; background: var(--c); }
+  .m-dot.active:hover { background: var(--c); }
+
+  .m-playbtn {
+    position: relative;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none; background: transparent;
+    cursor: pointer;
+    display: grid; place-items: center;
+    color: var(--c);
+    padding: 0;
+    transition: background .2s ease;
+  }
+  .m-playbtn:hover { background: var(--c-soft); }
+  .m-playbtn .icn-play  { display: none; }
+  .m-playbtn.paused .icn-pause { display: none; }
+  .m-playbtn.paused .icn-play  { display: block; margin-left: 1px; }
+  .m-ring { position: absolute; inset: 0; width: 26px; height: 26px; pointer-events: none; }
+  .m-ring-fg { transition: stroke-dashoffset .12s linear; }
+  .m-playbtn.paused .m-ring-fg { transition: none; }
+
+  .m-body { flex: 1; position: relative; overflow: hidden; }
+  .m-slide {
+    position: absolute; inset: 0;
+    padding: 14px 20px 16px;
+    opacity: 0; transform: translateX(24px);
+    transition: opacity .45s ease, transform .55s cubic-bezier(.22,.61,.36,1);
+    pointer-events: none;
+  }
+  .m-slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+  .m-slide.exit-left { opacity: 0; transform: translateX(-24px); }
+
+  /* ==================== SHARED CARDS ==================== */
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card {
+    background: var(--c-soft);
+    border-radius: 12px;
+    padding: 11px 12px;
+    display: flex; align-items: center; gap: 10px;
+    min-height: 64px;
+  }
+  .stat-card .ic { width: 36px; height: 36px; flex-shrink: 0; display: grid; place-items: center; }
+  .stat-card .meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .stat-label { font-size: 12.5px; color: var(--text-500); font-weight: 500; }
+  .stat-value {
+    font-size: 18px; font-weight: 700;
+    color: var(--c-strong);
+    letter-spacing: -0.3px; line-height: 1;
+  }
+  .stat-value .unit { font-size: 12px; color: var(--text-400); font-weight: 500; margin-left: 2px; }
+  .stat-foot { font-size: 11.5px; color: var(--text-400); margin-top: 2px; }
+  .stat-foot.up { color: #16A34A; font-weight: 600; }
+
+  .sect-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text-900);
+    letter-spacing: -0.2px;
+    margin: 12px 0 6px;
+  }
+  .sect-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 12px 0 6px;
+  }
+  .sect-row .sect-title { margin: 0; }
+  .sect-unit { font-size: 11.5px; color: var(--text-400); }
+
+  /* ==================== DETAIL LIST (slide 2) ==================== */
+  .detail-list { display: flex; flex-direction: column; }
+  .detail-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 2px;
+    border-bottom: 1px dashed var(--hairline);
+    cursor: pointer;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .ic-sm { width: 24px; height: 24px; flex-shrink: 0; display: grid; place-items: center; color: var(--c); }
+  .detail-row .lbl { flex: 1; font-size: 13.5px; color: var(--text-700); font-weight: 500; }
+  .detail-row .val { font-size: 14px; font-weight: 700; color: var(--text-900); letter-spacing: -0.2px; }
+  .detail-row .val .u { font-size: 11.5px; color: var(--text-400); font-weight: 500; margin-left: 3px; }
+  .detail-row .chev { color: var(--text-300); display: grid; place-items: center; }
+
+  .detail-foot {
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hairline);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .foot-link { flex: 1; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-500); }
+  .foot-btn {
+    border: 1px solid var(--c);
+    color: var(--c);
+    background: transparent;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: inherit;
+    transition: background .2s ease, color .2s ease;
+  }
+  .foot-btn:hover { background: var(--c); color: #fff; }
+
+  /* ==================== BAR CHART (energy) ==================== */
+  .chart-area {
+    position: relative; height: 198px;
+    padding: 14px 0 22px 32px;
+  }
+  .chart-grid {
+    position: absolute; left: 32px; right: 0; top: 14px; bottom: 22px;
+    display: flex; flex-direction: column-reverse; justify-content: space-between;
+  }
+  .chart-grid-line { position: relative; height: 1px; background: var(--grid); }
+  .chart-y {
+    position: absolute; left: 0; top: 14px; bottom: 22px;
+    width: 28px;
+    display: flex; flex-direction: column-reverse; justify-content: space-between;
+    font-size: 11px; color: var(--text-400); text-align: right; padding-right: 4px;
+  }
+  .chart-y span { transform: translateY(50%); line-height: 1; }
+  .chart-y span:last-child { transform: translateY(0); }
+  .chart-y span:first-child { transform: translateY(100%); }
+  .chart-bars {
+    position: relative; height: 100%;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    align-items: end; gap: 8px;
+  }
+  .bar-col {
+    display: flex; flex-direction: column; align-items: center;
+    height: 100%; justify-content: flex-end; position: relative;
+  }
+  .bar-val { font-size: 12px; font-weight: 700; color: var(--text-900); margin-bottom: 4px; }
+  .bar {
+    width: 26px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c) 75%, white) 0%, var(--c) 100%);
+    border-radius: 3px 3px 0 0;
+    transform-origin: bottom;
+    animation: barGrow .9s cubic-bezier(.2,.7,.3,1) both;
+  }
+  .bar-label {
+    position: absolute; bottom: -18px;
+    font-size: 11.5px; color: var(--text-500); white-space: nowrap;
+  }
+  @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+  /* ==================== MOBILITY-SPECIFIC ==================== */
+  .svc-box {
+    background: var(--c-soft);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-top: 8px;
+  }
+  .svc-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px;
+  }
+  .svc-head .svc-ic {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    display: grid; place-items: center;
+    color: var(--c);
+    flex-shrink: 0;
+  }
+  .svc-head .svc-name { font-size: 14px; font-weight: 700; color: var(--text-900); }
+  .svc-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px;
+  }
+  .svc-cell { display: flex; flex-direction: column; gap: 3px; }
+  .svc-cell .l { font-size: 11.5px; color: var(--text-500); }
+  .svc-cell .v { font-size: 15px; font-weight: 700; color: var(--c-strong); letter-spacing: -0.2px; }
+  .svc-cell .v .u { font-size: 11px; color: var(--text-400); font-weight: 500; margin-left: 2px; }
+
+  .drt-box {
+    background: var(--c-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .drt-box .svc-ic { width: 38px; height: 38px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--c); flex-shrink: 0; }
+  .drt-box .drt-meta { flex: 1; }
+  .drt-box .drt-title { font-size: 14px; font-weight: 700; color: var(--text-900); margin-bottom: 8px; }
+  .drt-box .drt-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
+  /* ==================== SAFETY-SPECIFIC ==================== */
+  .level-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .level-card {
+    background: var(--c-soft);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    text-align: center;
+  }
+  .level-card .ic-big { width: 30px; height: 30px; display: grid; place-items: center; color: var(--c); margin-bottom: 2px; }
+  .level-card .l { font-size: 11px; color: var(--text-500); }
+  .level-card .v { font-size: 18px; font-weight: 800; color: var(--c-strong); letter-spacing: -0.4px; }
+  .level-card .sub { font-size: 11px; color: var(--text-400); }
+
+  .water-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 10px 8px;
+  }
+  .water-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    text-align: center;
+    border-right: 1px solid var(--hairline);
+  }
+  .water-cell:last-child { border-right: none; }
+  .water-cell .ic { color: var(--c); }
+  .water-cell .l { font-size: 11.5px; color: var(--text-500); }
+  .water-cell .v { font-size: 14px; font-weight: 700; color: var(--c-strong); }
+  .water-cell .v.alt { color: var(--c); }
+
+  .stepper {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 4px 0;
+    margin-top: 4px;
+    position: relative;
+  }
+  .stepper::before {
+    content: ""; position: absolute;
+    left: 22px; right: 22px; top: 14px;
+    height: 2px; background: #E5E7EB;
+    z-index: 0;
+  }
+  .stepper .step {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    position: relative; z-index: 1;
+    flex: 1;
+  }
+  .stepper .step .dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #E5E7EB;
+    display: grid; place-items: center;
+    color: var(--text-300);
+  }
+  .stepper .step.active .dot {
+    border-color: var(--c);
+    background: var(--c-soft);
+    color: var(--c);
+  }
+  .stepper .step.done .dot {
+    border-color: #06A85B;
+    background: #E0F4E9;
+    color: #06A85B;
+  }
+  .stepper .step .lbl { font-size: 11.5px; color: var(--text-500); }
+  .stepper .step.active .lbl { color: var(--c); font-weight: 700; }
+  .stepper .step.done .lbl { color: #06A85B; font-weight: 600; }
+  .stepper-line {
+    position: absolute; left: 22px; top: 14px;
+    height: 2px; background: var(--c);
+    z-index: 0;
+  }
+
+  .info-box {
+    background: var(--c-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    display: flex; gap: 8px;
+  }
+  .info-box .ic { color: var(--c); flex-shrink: 0; margin-top: 1px; }
+  .info-box .body .h { font-size: 13px; font-weight: 700; color: var(--text-900); margin-bottom: 2px; }
+  .info-box .body .p { font-size: 12px; color: var(--text-700); line-height: 1.5; }
+  .info-box .body .meta { font-size: 11px; color: var(--text-400); margin-top: 4px; }
+
+  /* ==================== LINE CHART (safety + data) ==================== */
+  .line-chart { width: 100%; }
+  .legend-row { display: flex; gap: 14px; justify-content: center; margin-top: 4px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-700); }
+  .legend-dot { width: 14px; height: 2px; border-radius: 2px; }
+
+  /* ==================== DONUT CHART (data) ==================== */
+  .donut-row { display: grid; grid-template-columns: 130px 1fr; gap: 10px; align-items: center; }
+  .donut-legend { display: flex; flex-direction: column; gap: 7px; }
+  .donut-legend .item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; }
+  .donut-legend .item .sw { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .donut-legend .item .name { color: var(--text-700); flex: 1; }
+  .donut-legend .item .pct { font-weight: 700; color: var(--text-900); }
+
+  /* ==================== SAFETY SLIDE 1 — compact overrides ==================== */
+  .modal[data-color="orange"] .m-slide[data-slide="0"] { padding: 12px 20px 12px; }
+  .modal[data-color="orange"] .m-slide[data-slide="0"] .sect-title { margin: 8px 0 5px; font-size: 12.5px; }
+  .modal[data-color="orange"] .level-card { padding: 8px 12px; gap: 2px; }
+  .modal[data-color="orange"] .level-card .v { font-size: 16px; }
+  .modal[data-color="orange"] .level-card .ic-big { width: 24px; height: 24px; margin-bottom: 0; }
+  .modal[data-color="orange"] .water-row { padding: 8px 6px; }
+  .modal[data-color="orange"] .water-cell .v { font-size: 13px; }
+  .modal[data-color="orange"] .stepper { padding-top: 0; margin-top: 2px; }
+  .modal[data-color="orange"] .stepper .step .dot { width: 24px; height: 24px; }
+  .modal[data-color="orange"] .stepper::before { top: 12px; }
+  .modal[data-color="orange"] .info-box { padding: 8px 10px; margin-top: 8px; }
+  .modal[data-color="orange"] .info-box .body .h { font-size: 12.5px; }
+  .modal[data-color="orange"] .info-box .body .p { font-size: 11.5px; line-height: 1.45; }
+  .modal[data-color="orange"] .info-box .body .meta { font-size: 11px; margin-top: 3px; }
+
+  /* ==================== MOBILITY SLIDES — readability ==================== */
+  .modal[data-color="green"] .m-slide { padding: 14px 22px 12px; }
+  .modal[data-color="green"] .m-slide .sect-title { margin: 10px 0 6px; }
+  .modal[data-color="green"] .m-slide .stat-card { min-height: 64px; padding: 10px 12px; }
+  .modal[data-color="green"] .svc-box { padding: 12px 14px; margin-top: 8px; }
+  .modal[data-color="green"] .drt-box { padding: 12px 14px; margin-top: 10px; }
+  .modal[data-color="green"] .m-slide[data-slide="2"] .detail-row { padding: 8px 2px; }
+  .modal[data-color="green"] .m-slide[data-slide="2"] .detail-foot { margin-top: 8px; padding-top: 10px; }
+
+  /* ==================== SAFETY SLIDE 1 — compact ==================== */
+  .modal[data-color="orange"] .m-slide[data-slide="1"] { padding: 12px 20px 12px; }
+  .modal[data-color="orange"] .m-slide[data-slide="1"] .sect-row { margin: 4px 0 4px; }
+  .modal[data-color="orange"] .m-slide[data-slide="1"] .sect-title { margin: 8px 0 4px; font-size: 12.5px; }
+  .modal[data-color="orange"] .m-slide[data-slide="1"] .line-chart { max-height: 124px; }
+  .modal[data-color="orange"] .m-slide[data-slide="1"] .detail-row { padding: 6px 2px; }
+</style>
+</head>
+<body>
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="grid-2x2">
+
+      <!-- =================================================================== -->
+      <!-- ENERGY MILE — BLUE                                                   -->
+      <!-- =================================================================== -->
+      <div class="modal" data-color="blue" data-interval="8000">
+        <div class="m-header">
+          <div class="m-logo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="11" stroke="white" stroke-width="1.4" opacity=".55"/>
+              <path d="M13.2 4 L7 13.2 H11.2 L10.2 20 L17 10.4 H12.6 L13.2 4 Z" fill="white"/>
+            </svg>
+          </div>
+          <div class="m-titlewrap">
+            <div class="m-title">에너지 마일</div>
+            <div class="m-subtitle">신재생에너지 생산 · 가상거래 현황</div>
+          </div>
+          <div class="m-controls">
+            <div class="m-dots">
+              <button class="m-dot active" data-i="0" aria-label="1"></button>
+              <button class="m-dot" data-i="1" aria-label="2"></button>
+            </div>
+            <button class="m-playbtn" aria-label="일시정지">
+              <svg class="icn-pause" width="9" height="9" viewBox="0 0 10 10"><rect x="2" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/><rect x="6" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/></svg>
+              <svg class="icn-play" width="9" height="9" viewBox="0 0 10 10"><path d="M2.5 1.4 L8.4 5 L2.5 8.6 Z" fill="currentColor"/></svg>
+              <svg class="m-ring" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5" fill="none" stroke="#E1E5EB" stroke-width="1.5"/><circle class="m-ring-fg" cx="13" cy="13" r="11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="72.26" stroke-dashoffset="72.26" transform="rotate(-90 13 13)"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="m-body">
+          <section class="m-slide active" data-slide="0">
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="ic">
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="13" r="4" stroke="currentColor" stroke-width="1.5" style="color:#0C8AE5"/>
+                    <g stroke="#0C8AE5" stroke-width="1.3" stroke-linecap="round">
+                      <line x1="20" y1="5" x2="20" y2="6.8"/><line x1="12" y1="6.8" x2="13.6" y2="8.4"/><line x1="28" y1="6.8" x2="26.4" y2="8.4"/><line x1="9.6" y1="13" x2="11.6" y2="13"/><line x1="30.4" y1="13" x2="28.4" y2="13"/>
+                    </g>
+                    <path d="M9 22 H31 L34 34 H6 Z" fill="#0C8AE5"/>
+                    <g stroke="#A8C8FF" stroke-width=".8"><line x1="13" y1="22" x2="11" y2="34"/><line x1="20" y1="22" x2="20" y2="34"/><line x1="27" y1="22" x2="29" y2="34"/><line x1="9.5" y1="26" x2="30.5" y2="26"/><line x1="8" y1="30" x2="32" y2="30"/></g>
+                  </svg>
+                </div>
+                <div class="meta">
+                  <span class="stat-label">누적발전량</span>
+                  <span class="stat-value">1,284.2<span class="unit">kWh</span></span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="ic">
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <path d="M14 10c-3 0-5 2-5 5 0 1.4.6 2.6 1.5 3.4-.9.9-1.5 2.1-1.5 3.4 0 2.6 2.1 4.7 4.7 4.7.4 0 .8-.1 1.2-.2v3c0 1.1.9 2 2 2h.6c1.1 0 2-.9 2-2V14c0-2.2-1.8-4-4-4h-1.5z" stroke="#0C8AE5" stroke-width="1.5" fill="none"/>
+                    <path d="M26 10c3 0 5 2 5 5 0 1.4-.6 2.6-1.5 3.4.9.9 1.5 2.1 1.5 3.4 0 2.6-2.1 4.7-4.7 4.7-.4 0-.8-.1-1.2-.2v3c0 1.1-.9 2-2 2h-.6c-1.1 0-2-.9-2-2V14c0-2.2 1.8-4 4-4h1.5z" stroke="#0C8AE5" stroke-width="1.5" fill="none"/>
+                    <text x="20" y="22" text-anchor="middle" font-size="7" font-weight="700" fill="#0C8AE5" font-family="Pretendard">AI</text>
+                  </svg>
+                </div>
+                <div class="meta">
+                  <span class="stat-label">AI 예측 발전량</span>
+                  <span class="stat-value">1,248<span class="unit">kWh</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="sect-row"><span class="sect-title">월간 전력 흐름</span><span class="sect-unit">단위: kWh</span></div>
+            <div class="chart-area">
+              <div class="chart-y"><span>0</span><span>2,000</span><span>4,000</span><span>6,000</span><span>8,000</span><span>10,000</span></div>
+              <div class="chart-grid"><div class="chart-grid-line"></div><div class="chart-grid-line"></div><div class="chart-grid-line"></div><div class="chart-grid-line"></div><div class="chart-grid-line"></div><div class="chart-grid-line"></div></div>
+              <div class="chart-bars">
+                <div class="bar-col"><span class="bar-val">7,860</span><div class="bar" style="height:78.6%"></div><span class="bar-label">소비 전력량</span></div>
+                <div class="bar-col"><span class="bar-val">8,420</span><div class="bar" style="height:84.2%;animation-delay:80ms"></div><span class="bar-label">발전 전력량</span></div>
+                <div class="bar-col"><span class="bar-val">4,120</span><div class="bar" style="height:41.2%;animation-delay:160ms"></div><span class="bar-label">상계량</span></div>
+                <div class="bar-col"><span class="bar-val">680</span><div class="bar" style="height:6.8%;animation-delay:240ms"></div><span class="bar-label">수혜 전력량</span></div>
+              </div>
+            </div>
+          </section>
+          <section class="m-slide" data-slide="1">
+            <div class="sect-title" style="margin-top:6px">가상거래 상세</div>
+            <div class="detail-list">
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 11 L12 4 L20 11 V20 H14 V14 H10 V20 H4 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+                <div class="lbl">소비 전력량</div>
+                <div class="val">7,860<span class="u">kWh</span></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="2.4" stroke="currentColor" stroke-width="1.5"/><path d="M5 13 H19 L21 21 H3 Z" fill="currentColor" opacity=".85"/></svg></div>
+                <div class="lbl">발전 전력량</div>
+                <div class="val">8,420<span class="u">kWh</span></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 9 H17 L14 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 15 H7 L10 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="lbl">상계량</div>
+                <div class="val">4,120<span class="u">kWh</span></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="2.6" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="10" r="2.1" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 18c0-2.5 2.5-4.2 5.5-4.2s5.5 1.7 5.5 4.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+                <div class="lbl">수혜 전력량</div>
+                <div class="val">680<span class="u">kWh</span></div>
+              </div>
+            </div>
+            <div class="detail-foot">
+              <div class="foot-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 21V7l7-4 7 4v14" stroke="#9AA1AC" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 21v-6h6v6" stroke="#9AA1AC" stroke-width="1.5"/></svg>
+                <span>광명역세권 에너지 가상거래 서비스 연계</span>
+              </div>
+              <button class="foot-btn">상세보기 <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- MOBILITY MILE — GREEN                                                -->
+      <!-- =================================================================== -->
+      <div class="modal" data-color="green" data-interval="10000">
+        <div class="m-header">
+          <div class="m-logo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="4" width="14" height="13" rx="2.5" fill="white"/>
+              <rect x="5" y="4" width="14" height="3.5" rx="2.5" fill="white" opacity=".7"/>
+              <circle cx="8" cy="18" r="1.6" fill="white"/>
+              <circle cx="16" cy="18" r="1.6" fill="white"/>
+              <line x1="6.5" y1="9" x2="17.5" y2="9" stroke="#06A85B" stroke-width="1"/>
+              <rect x="7" y="10.5" width="4" height="3" rx=".5" fill="#06A85B"/>
+              <rect x="13" y="10.5" width="4" height="3" rx=".5" fill="#06A85B"/>
+            </svg>
+          </div>
+          <div class="m-titlewrap">
+            <div class="m-title">모빌리티 마일</div>
+            <div class="m-subtitle">친환경 이동 서비스 통합 운영 현황</div>
+          </div>
+          <div class="m-controls">
+            <div class="m-dots">
+              <button class="m-dot active" data-i="0"></button>
+              <button class="m-dot" data-i="1"></button>
+              <button class="m-dot" data-i="2"></button>
+            </div>
+            <button class="m-playbtn" aria-label="일시정지">
+              <svg class="icn-pause" width="9" height="9" viewBox="0 0 10 10"><rect x="2" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/><rect x="6" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/></svg>
+              <svg class="icn-play" width="9" height="9" viewBox="0 0 10 10"><path d="M2.5 1.4 L8.4 5 L2.5 8.6 Z" fill="currentColor"/></svg>
+              <svg class="m-ring" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5" fill="none" stroke="#E1E5EB" stroke-width="1.5"/><circle class="m-ring-fg" cx="13" cy="13" r="11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="72.26" stroke-dashoffset="72.26" transform="rotate(-90 13 13)"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="m-body">
+          <section class="m-slide active" data-slide="0">
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="ic">
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <path d="M8 26 C12 16 22 14 30 10 C28 18 24 26 14 30 Z" fill="#06A85B" opacity=".25"/>
+                    <path d="M10 28 C14 18 22 16 30 12 M14 26 C18 22 22 20 26 18" stroke="#06A85B" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  </svg>
+                </div>
+                <div class="meta">
+                  <span class="stat-label">친환경 이동거리</span>
+                  <span class="stat-value">18,420<span class="unit">km</span></span>
+                  <span class="stat-foot">전기이륜차 + DRT 기준</span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="ic">
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <circle cx="14" cy="14" r="3.5" stroke="#06A85B" stroke-width="1.6"/>
+                    <circle cx="24" cy="14" r="3" stroke="#06A85B" stroke-width="1.6"/>
+                    <path d="M7 28c0-4 3.5-6.5 7-6.5s7 2.5 7 6.5" stroke="#06A85B" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M22 22.5c3.5 0 6 2 6 5.5" stroke="#06A85B" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="meta">
+                  <span class="stat-label">주간 이용자수</span>
+                  <span class="stat-value">1,284<span class="unit">명</span></span>
+                  <span class="stat-foot">카셰어링 기준</span>
+                </div>
+              </div>
+            </div>
+            <div class="sect-title" style="margin-top:10px">친환경 배달문화 벨류체인</div>
+            <div class="svc-box">
+              <div class="svc-head">
+                <div class="svc-ic">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="18" r="2.4" stroke="currentColor" stroke-width="1.4"/><circle cx="18" cy="18" r="2.4" stroke="currentColor" stroke-width="1.4"/><path d="M8 18 H15 L18 12 H10 L7 18" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/><rect x="13" y="6" width="5" height="3" rx=".5" stroke="currentColor" stroke-width="1.4"/></svg>
+                </div>
+                <div class="svc-name">전기이륜차 · 다회용기 통합 운영</div>
+              </div>
+              <div class="svc-grid">
+                <div class="svc-cell"><span class="l">전기이륜차 라이더수</span><span class="v">68<span class="u">명</span></span></div>
+                <div class="svc-cell"><span class="l">전기이륜차 이동거리</span><span class="v">9,240<span class="u">km</span></span></div>
+                <div class="svc-cell"><span class="l">전기이륜차 배달건수</span><span class="v">3,186<span class="u">건</span></span></div>
+                <div class="svc-cell"><span class="l">다회용 식당 수</span><span class="v">24<span class="u">개</span></span></div>
+                <div class="svc-cell"><span class="l">다회용기 배달 주문 수</span><span class="v">842<span class="u">건</span></span></div>
+                <div class="svc-cell"><span class="l">충전 전력량</span><span class="v">428<span class="u">kWh</span></span></div>
+                <div class="svc-cell"><span class="l">대당 BSS 교환 횟수</span><span class="v">156<span class="u">회</span></span></div>
+              </div>
+            </div>
+          </section>
+          <section class="m-slide" data-slide="1">
+            <div class="sect-title" style="margin-top:6px">전기차 기반 모빌리티 서비스</div>
+            <div class="svc-box">
+              <div class="svc-head">
+                <div class="svc-ic">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 14 L6 9 H18 L20 14 V18 H4 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="8" cy="18.5" r="1.4" stroke="currentColor" stroke-width="1.4"/><circle cx="16" cy="18.5" r="1.4" stroke="currentColor" stroke-width="1.4"/></svg>
+                </div>
+                <div class="svc-name">전기차기반 커뮤니티 카셰어링</div>
+              </div>
+              <div class="svc-grid">
+                <div class="svc-cell"><span class="l">운영 차량 대수</span><span class="v">12<span class="u">대</span></span></div>
+                <div class="svc-cell"><span class="l">업무용 이용 건수</span><span class="v">126<span class="u">건</span></span></div>
+                <div class="svc-cell"><span class="l">개인용 이용 건수</span><span class="v">94<span class="u">건</span></span></div>
+                <div class="svc-cell"><span class="l">이용자수</span><span class="v">218<span class="u">명</span></span></div>
+              </div>
+            </div>
+            <div class="drt-box">
+              <div class="svc-ic">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="6.5" y1="10" x2="17.5" y2="10" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="18.5" r="1.4" stroke="currentColor" stroke-width="1.3"/><circle cx="16" cy="18.5" r="1.4" stroke="currentColor" stroke-width="1.3"/></svg>
+              </div>
+              <div class="drt-meta">
+                <div class="drt-title">전기버스기반 친환경 DRT</div>
+                <div class="drt-stats">
+                  <div class="svc-cell"><span class="l">전기차 누적주행거리</span><span class="v">9,180<span class="u">km</span></span></div>
+                  <div class="svc-cell"><span class="l">전기차 충전량</span><span class="v">612<span class="u">kW</span></span></div>
+                  <div class="svc-cell"><span class="l">평균 차량운행시간</span><span class="v">7.2<span class="u">시간</span></span></div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="m-slide" data-slide="2">
+            <div class="sect-title" style="margin-top:6px">주요 상세 지표</div>
+            <div class="detail-list">
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="18" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="18" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 18 H15 L18 12 H10 L7 18" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+                <div class="lbl">전기이륜차 배달건수</div>
+                <div class="val">3,186<span class="u">건</span></div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 8 H18 L17 18 H7 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 8 V6 a3 3 0 0 1 6 0 V8" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="lbl">다회용기 배달 주문 수</div>
+                <div class="val">842<span class="u">건</span></div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 14 L6 9 H18 L20 14 V18 H4 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="8" cy="18" r="1.3" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="18" r="1.3" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="lbl">운영 차량 대수</div>
+                <div class="val">12<span class="u">대</span></div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 8 V12 L15 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+                <div class="lbl">평균 차량운행시간</div>
+                <div class="val">7.2<span class="u">시간</span></div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+            </div>
+            <div class="detail-foot">
+              <div class="foot-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 20 H21 M5 20 V8 H10 V20 M14 20 V12 H19 V20" stroke="#9AA1AC" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                <span>광명역세권 모빌리티 서비스 연계</span>
+              </div>
+              <button class="foot-btn">상세보기 <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- SAFETY MILE — ORANGE                                                 -->
+      <!-- =================================================================== -->
+      <div class="modal" data-color="orange" data-interval="7000">
+        <div class="m-header">
+          <div class="m-logo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z" fill="white"/>
+              <path d="M9 12 L11 14 L15.5 9.5" stroke="#EC8913" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="m-titlewrap">
+            <div class="m-title">세이프티 마일</div>
+            <div class="m-subtitle">AIoT 침수·홍수 통합관제 현황</div>
+          </div>
+          <div class="m-controls">
+            <div class="m-dots">
+              <button class="m-dot active" data-i="0"></button>
+              <button class="m-dot" data-i="1"></button>
+            </div>
+            <button class="m-playbtn" aria-label="일시정지">
+              <svg class="icn-pause" width="9" height="9" viewBox="0 0 10 10"><rect x="2" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/><rect x="6" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/></svg>
+              <svg class="icn-play" width="9" height="9" viewBox="0 0 10 10"><path d="M2.5 1.4 L8.4 5 L2.5 8.6 Z" fill="currentColor"/></svg>
+              <svg class="m-ring" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5" fill="none" stroke="#E1E5EB" stroke-width="1.5"/><circle class="m-ring-fg" cx="13" cy="13" r="11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="72.26" stroke-dashoffset="72.26" transform="rotate(-90 13 13)"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="m-body">
+          <section class="m-slide active" data-slide="0">
+            <div class="level-row">
+              <div class="level-card">
+                <div class="ic-big">
+                  <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                    <ellipse cx="16" cy="10" rx="11" ry="3.5" fill="#EC8913" opacity=".25"/>
+                    <ellipse cx="16" cy="10" rx="11" ry="3.5" stroke="#EC8913" stroke-width="1.4"/>
+                    <path d="M5 10 V18 a11 3.5 0 0 0 22 0 V10" stroke="#EC8913" stroke-width="1.4"/>
+                    <line x1="9" y1="14" x2="23" y2="14" stroke="#EC8913" stroke-width="1.2" opacity=".5"/>
+                    <line x1="9" y1="17" x2="23" y2="17" stroke="#EC8913" stroke-width="1.2" opacity=".5"/>
+                  </svg>
+                </div>
+                <span class="l">맨홀 수위 레벨</span>
+                <span class="v">정상</span>
+                <span class="sub">현재 상태 안정</span>
+              </div>
+              <div class="level-card">
+                <div class="ic-big">
+                  <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 4 L29 26 H3 Z" fill="#EC8913" opacity=".25" stroke="#EC8913" stroke-width="1.4" stroke-linejoin="round"/>
+                    <line x1="16" y1="12" x2="16" y2="19" stroke="#EC8913" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="16" cy="22.5" r="1.2" fill="#EC8913"/>
+                  </svg>
+                </div>
+                <span class="l">경보등급</span>
+                <span class="v">관심</span>
+                <span class="sub">사전 모니터링 단계</span>
+              </div>
+            </div>
+            <div class="sect-title">현재 수위 현황</div>
+            <div class="water-row">
+              <div class="water-cell">
+                <div class="ic"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="11" rx="9" ry="3" stroke="currentColor" stroke-width="1.4"/><path d="M7 11 V20 a9 3 0 0 0 18 0 V11" stroke="currentColor" stroke-width="1.4"/></svg></div>
+                <span class="l">맨홀 수위</span>
+                <span class="v alt">18 <small style="font-size:10px;color:#9AA1AC;font-weight:500">cm</small></span>
+              </div>
+              <div class="water-cell">
+                <div class="ic"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M16 5 C12 12 8 16 8 21 a8 8 0 0 0 16 0 C24 16 20 12 16 5 Z" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.4"/></svg></div>
+                <span class="l">지표면수위</span>
+                <span class="v alt">6 <small style="font-size:10px;color:#9AA1AC;font-weight:500">cm</small></span>
+              </div>
+              <div class="water-cell">
+                <div class="ic"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><path d="M3 14 q3-3 6 0 t6 0 t6 0 t6 0" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M3 20 q3-3 6 0 t6 0 t6 0 t6 0" stroke="currentColor" stroke-width="1.4" fill="none"/><rect x="9" y="6" width="5" height="6" stroke="currentColor" stroke-width="1.3"/><rect x="17" y="6" width="5" height="6" stroke="currentColor" stroke-width="1.3"/></svg></div>
+                <span class="l">홍수구분</span>
+                <span class="v alt" style="font-size:13px">도시침수</span>
+              </div>
+            </div>
+            <div class="sect-title">위험 단계 기준</div>
+            <div class="stepper">
+              <div class="stepper-line" id="stepperLine"></div>
+              <div class="step done">
+                <div class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z" stroke="currentColor" stroke-width="1.6"/></svg></div>
+                <span class="lbl">정상</span>
+              </div>
+              <div class="step active">
+                <div class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 4 L22 20 H2 Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><line x1="12" y1="10" x2="12" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></div>
+                <span class="lbl">관심</span>
+              </div>
+              <div class="step">
+                <div class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 4 L22 20 H2 Z" stroke="currentColor" stroke-width="1.6"/></svg></div>
+                <span class="lbl">주의</span>
+              </div>
+              <div class="step">
+                <div class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12 L12 5 L19 12 V20 H5 Z" stroke="currentColor" stroke-width="1.6"/></svg></div>
+                <span class="lbl">경계</span>
+              </div>
+              <div class="step">
+                <div class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="14" r="6" stroke="currentColor" stroke-width="1.6"/><line x1="12" y1="4" x2="12" y2="8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+                <span class="lbl">심각</span>
+              </div>
+            </div>
+            <div class="info-box">
+              <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><line x1="12" y1="11" x2="12" y2="16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="8.5" r="1" fill="currentColor"/></svg></div>
+              <div class="body">
+                <div class="h">현재 상태</div>
+                <div class="p">맨홀 수위는 정상 범위이며, 도시침수 가능성은 관심 단계로 모니터링 중입니다.</div>
+                <div class="meta">기준 데이터: 맨홀 수위 · 지표면수위 · 홍수구분 · 경보등급</div>
+              </div>
+            </div>
+          </section>
+          <section class="m-slide" data-slide="1">
+            <div class="sect-row" style="margin-top:6px"><span class="sect-title">맨홀·지표면 수위 변화</span><span class="sect-unit">단위: cm</span></div>
+            <svg class="line-chart" viewBox="0 0 430 170" preserveAspectRatio="none">
+              <!-- y axis labels & grid -->
+              <g font-family="Pretendard" font-size="9" fill="#9AA1AC">
+                <text x="22" y="22" text-anchor="end">40</text>
+                <text x="22" y="52" text-anchor="end">30</text>
+                <text x="22" y="82" text-anchor="end">20</text>
+                <text x="22" y="112" text-anchor="end">10</text>
+                <text x="22" y="142" text-anchor="end">0</text>
+              </g>
+              <g stroke="#EEF1F5" stroke-width="1">
+                <line x1="28" y1="20" x2="426" y2="20"/>
+                <line x1="28" y1="50" x2="426" y2="50"/>
+                <line x1="28" y1="80" x2="426" y2="80"/>
+                <line x1="28" y1="110" x2="426" y2="110"/>
+                <line x1="28" y1="140" x2="426" y2="140"/>
+              </g>
+              <!-- x labels -->
+              <g font-family="Pretendard" font-size="9" fill="#9AA1AC" text-anchor="middle">
+                <text x="60"  y="156">06</text>
+                <text x="135" y="156">09</text>
+                <text x="210" y="156">12</text>
+                <text x="285" y="156">15</text>
+                <text x="360" y="156">18</text>
+                <text x="425" y="156">21</text>
+              </g>
+              <!-- 맨홀 수위 (orange) values: 12, 18, 25, 20, 16, 12 -->
+              <polyline fill="none" stroke="#EC8913" stroke-width="1.8" stroke-linejoin="round"
+                points="60,104 135,86 210,65 285,80 360,92 425,104"/>
+              <g fill="#fff" stroke="#EC8913" stroke-width="1.6">
+                <circle cx="60" cy="104" r="3"/><circle cx="135" cy="86" r="3"/><circle cx="210" cy="65" r="3"/><circle cx="285" cy="80" r="3"/><circle cx="360" cy="92" r="3"/><circle cx="425" cy="104" r="3"/>
+              </g>
+              <!-- 지표면 수위 (blue) values: 3, 4, 7, 5, 4, 3 -->
+              <polyline fill="none" stroke="#2C7BF2" stroke-width="1.8" stroke-linejoin="round"
+                points="60,131 135,128 210,119 285,125 360,128 425,131"/>
+              <g fill="#fff" stroke="#2C7BF2" stroke-width="1.6">
+                <circle cx="60" cy="131" r="3"/><circle cx="135" cy="128" r="3"/><circle cx="210" cy="119" r="3"/><circle cx="285" cy="125" r="3"/><circle cx="360" cy="128" r="3"/><circle cx="425" cy="131" r="3"/>
+              </g>
+            </svg>
+            <div class="legend-row">
+              <div class="legend-item"><span class="legend-dot" style="background:#EC8913"></span>맨홀 수위</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#2C7BF2"></span>지표면 수위</div>
+            </div>
+            <div class="sect-title" style="margin-top:10px">위험 상태 상세</div>
+            <div class="detail-list">
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 11 a10 10 0 0 1 16 0 M7.5 14 a6 6 0 0 1 9 0 M10.5 17 a2.5 2.5 0 0 1 3 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg></div>
+                <div class="lbl">AIoT 수위센서</div>
+                <div class="val">12개소 정상</div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 17 V11 a6 6 0 0 1 12 0 V17 L20 19 H4 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 19 a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="lbl">최근 위험 알림</div>
+                <div class="val">없음</div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="12" stroke="currentColor" stroke-width="1.5"/><line x1="4" y1="10" x2="20" y2="10" stroke="currentColor" stroke-width="1.2"/><line x1="4" y1="14" x2="20" y2="14" stroke="currentColor" stroke-width="1.2"/><line x1="9" y1="6" x2="9" y2="18" stroke="currentColor" stroke-width="1.2"/><line x1="15" y1="6" x2="15" y2="18" stroke="currentColor" stroke-width="1.2"/></svg></div>
+                <div class="lbl">IoT 그린배리어</div>
+                <div class="val">4개소 연계</div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4 L22 20 H2 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><line x1="12" y1="10" x2="12" y2="15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></div>
+                <div class="lbl">경보등급</div>
+                <div class="val">관심</div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- DATA MILE — PURPLE                                                   -->
+      <!-- =================================================================== -->
+      <div class="modal" data-color="purple" data-interval="9000">
+        <div class="m-header">
+          <div class="m-logo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M7 17 a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.5 A4 4 0 0 1 18 17 Z" fill="white"/>
+              <circle cx="9" cy="14" r="1.4" fill="#636CCC"/>
+              <circle cx="15" cy="14" r="1.4" fill="#636CCC"/>
+              <circle cx="12" cy="11" r="1.4" fill="#636CCC"/>
+              <line x1="9" y1="14" x2="12" y2="11" stroke="#636CCC" stroke-width=".9"/>
+              <line x1="15" y1="14" x2="12" y2="11" stroke="#636CCC" stroke-width=".9"/>
+            </svg>
+          </div>
+          <div class="m-titlewrap">
+            <div class="m-title">데이터 마일</div>
+            <div class="m-subtitle">탄소 거래·데이터 통합 플랫폼 현황</div>
+          </div>
+          <div class="m-controls">
+            <div class="m-dots">
+              <button class="m-dot active" data-i="0"></button>
+              <button class="m-dot" data-i="1"></button>
+            </div>
+            <button class="m-playbtn" aria-label="일시정지">
+              <svg class="icn-pause" width="9" height="9" viewBox="0 0 10 10"><rect x="2" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/><rect x="6" y="1.5" width="2" height="7" rx=".5" fill="currentColor"/></svg>
+              <svg class="icn-play" width="9" height="9" viewBox="0 0 10 10"><path d="M2.5 1.4 L8.4 5 L2.5 8.6 Z" fill="currentColor"/></svg>
+              <svg class="m-ring" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5" fill="none" stroke="#E1E5EB" stroke-width="1.5"/><circle class="m-ring-fg" cx="13" cy="13" r="11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="72.26" stroke-dashoffset="72.26" transform="rotate(-90 13 13)"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="m-body">
+          <section class="m-slide active" data-slide="0">
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="ic">
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="11" fill="#636CCC" opacity=".18"/>
+                    <path d="M20 12 c-2 4-5 5-5 9 a5 5 0 0 0 10 0 c0-4-3-5-5-9 Z" fill="#636CCC"/>
+                    <text x="20" y="22.5" text-anchor="middle" font-size="6.5" font-weight="700" fill="white" font-family="Pretendard">CO₂</text>
+                  </svg>
+                </div>
+                <div class="meta">
+                  <span class="stat-label">금일 탄소거래</span>
+                  <span class="stat-value">128<span class="unit">건</span></span>
+                  <span class="stat-foot">전일 대비 <span class="up">↑ +9.4%</span></span>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="ic">
+                  <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                    <ellipse cx="20" cy="11" rx="10" ry="3.2" stroke="#636CCC" stroke-width="1.5"/>
+                    <path d="M10 11 V18 a10 3.2 0 0 0 20 0 V11" stroke="#636CCC" stroke-width="1.5"/>
+                    <path d="M10 18 V25 a10 3.2 0 0 0 20 0 V18" stroke="#636CCC" stroke-width="1.5"/>
+                    <ellipse cx="20" cy="25" rx="10" ry="3.2" fill="#636CCC" opacity=".15"/>
+                  </svg>
+                </div>
+                <div class="meta">
+                  <span class="stat-label">수집 데이터</span>
+                  <span class="stat-value">18,420<span class="unit">건</span></span>
+                  <span class="stat-foot">전일 대비 <span class="up">↑ +6.2%</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="sect-row"><span class="sect-title">시간대별 거래량</span><span class="sect-unit">단위: 건</span></div>
+            <svg class="line-chart" viewBox="0 0 430 200" preserveAspectRatio="none">
+              <g font-family="Pretendard" font-size="9" fill="#9AA1AC">
+                <text x="22" y="20" text-anchor="end">250</text>
+                <text x="22" y="55" text-anchor="end">200</text>
+                <text x="22" y="90" text-anchor="end">150</text>
+                <text x="22" y="125" text-anchor="end">100</text>
+                <text x="22" y="160" text-anchor="end">50</text>
+              </g>
+              <g stroke="#EEF1F5" stroke-width="1">
+                <line x1="28" y1="18" x2="426" y2="18"/>
+                <line x1="28" y1="53" x2="426" y2="53"/>
+                <line x1="28" y1="88" x2="426" y2="88"/>
+                <line x1="28" y1="123" x2="426" y2="123"/>
+                <line x1="28" y1="158" x2="426" y2="158"/>
+              </g>
+              <g font-family="Pretendard" font-size="9" fill="#9AA1AC" text-anchor="middle">
+                <text x="60"  y="178">06</text>
+                <text x="135" y="178">09</text>
+                <text x="210" y="178">12</text>
+                <text x="285" y="178">15</text>
+                <text x="360" y="178">18</text>
+                <text x="425" y="178">21</text>
+              </g>
+              <!-- area: 60→ ~140 → ~110 → ~55 → ~85 → ~125 → ~140 -->
+              <path d="M60,140 L135,110 L210,55 L285,85 L360,125 L425,140 L425,158 L60,158 Z" fill="#636CCC" opacity=".18"/>
+              <polyline fill="none" stroke="#636CCC" stroke-width="2" stroke-linejoin="round"
+                points="60,140 135,110 210,55 285,85 360,125 425,140"/>
+              <g fill="#fff" stroke="#636CCC" stroke-width="1.6">
+                <circle cx="60" cy="140" r="3"/><circle cx="135" cy="110" r="3"/><circle cx="210" cy="55" r="3.5"/><circle cx="285" cy="85" r="3"/><circle cx="360" cy="125" r="3"/><circle cx="425" cy="140" r="3"/>
+              </g>
+            </svg>
+          </section>
+          <section class="m-slide" data-slide="1">
+            <div class="sect-title" style="margin-top:6px">플랫폼 이용 분포</div>
+            <div class="donut-row">
+              <svg viewBox="0 0 120 120" width="120" height="120">
+                <!-- donut: total 360°, 38% orange, 24% purple, 22% blue, 16% yellow -->
+                <!-- circumference = 2π·45 = 282.74 -->
+                <g transform="rotate(-90 60 60)" fill="none" stroke-width="22">
+                  <circle cx="60" cy="60" r="45" stroke="#F2A33A" stroke-dasharray="107.44 282.74" stroke-dashoffset="0"/>
+                  <circle cx="60" cy="60" r="45" stroke="#A78BD8" stroke-dasharray="67.86 282.74" stroke-dashoffset="-107.44"/>
+                  <circle cx="60" cy="60" r="45" stroke="#5AA8E8" stroke-dasharray="62.20 282.74" stroke-dashoffset="-175.30"/>
+                  <circle cx="60" cy="60" r="45" stroke="#F2D24A" stroke-dasharray="45.24 282.74" stroke-dashoffset="-237.50"/>
+                </g>
+                <circle cx="60" cy="60" r="30" fill="#fff"/>
+                <g>
+                  <text x="60" y="58" text-anchor="middle" font-size="9" fill="#636CCC" font-family="Pretendard" font-weight="700">CO₂</text>
+                  <rect x="51" y="62" width="18" height="10" rx="1" fill="none" stroke="#636CCC" stroke-width="1.2"/>
+                  <line x1="54" y1="68" x2="54" y2="70" stroke="#636CCC" stroke-width="1"/>
+                  <line x1="58" y1="66" x2="58" y2="70" stroke="#636CCC" stroke-width="1"/>
+                  <line x1="62" y1="64" x2="62" y2="70" stroke="#636CCC" stroke-width="1"/>
+                  <line x1="66" y1="65" x2="66" y2="70" stroke="#636CCC" stroke-width="1"/>
+                </g>
+              </svg>
+              <div class="donut-legend">
+                <div class="item"><span class="sw" style="background:#F2A33A"></span><span class="name">CCM 거래</span><span class="pct">38%</span></div>
+                <div class="item"><span class="sw" style="background:#A78BD8"></span><span class="name">VCM 거래</span><span class="pct">24%</span></div>
+                <div class="item"><span class="sw" style="background:#5AA8E8"></span><span class="name">데이터 통합플랫폼</span><span class="pct">22%</span></div>
+                <div class="item"><span class="sw" style="background:#F2D24A"></span><span class="name">시민 참여/리워드</span><span class="pct">16%</span></div>
+              </div>
+            </div>
+            <div class="detail-list" style="margin-top:6px">
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 18 L10 12 L14 16 L20 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6 H20 V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+                <div class="lbl">누적 탄소감축량</div>
+                <div class="val">3.28<span class="u">tCO₂eq</span></div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="18" r="2" stroke="currentColor" stroke-width="1.5"/><line x1="7.4" y1="7.4" x2="10.6" y2="16.6" stroke="currentColor" stroke-width="1.4"/><line x1="16.6" y1="7.4" x2="13.4" y2="16.6" stroke="currentColor" stroke-width="1.4"/><line x1="8" y1="6" x2="16" y2="6" stroke="currentColor" stroke-width="1.4"/></svg></div>
+                <div class="lbl">연계 시스템</div>
+                <div class="val">13<span class="u">개</span></div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+              <div class="detail-row">
+                <div class="ic-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12 L11 14 L15.5 9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="lbl">최근 거래 상태</div>
+                <div class="val">정상</div>
+                <div class="chev"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></div>
+              </div>
+            </div>
+            <div class="detail-foot">
+              <div class="foot-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 20 H21 M5 20 V8 H10 V20 M14 20 V12 H19 V20" stroke="#9AA1AC" stroke-width="1.4" stroke-linejoin="round"/></svg>
+                <span>광명역세권 탄소 데이터 서비스 연계</span>
+              </div>
+              <button class="foot-btn">상세보기 <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M9 6 L15 12 L9 18" stroke="currentColor" stroke-width="2"/></svg></button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // ----- Scale stage 1920x1080 to viewport -----
+  (function fitStage() {
+    const stage = document.getElementById('stage');
+    function fit() {
+      const sx = window.innerWidth / 1920;
+      const sy = window.innerHeight / 1080;
+      const s = Math.min(sx, sy);
+      stage.style.transform = `scale(${s})`;
+      stage.style.left = ((window.innerWidth - 1920 * s) / 2) + 'px';
+      stage.style.top = ((window.innerHeight - 1080 * s) / 2) + 'px';
+    }
+    fit();
+    window.addEventListener('resize', fit);
+  })();
+
+  // ----- Carousel factory: one instance per .modal -----
+  function initCarousel(modal) {
+    const slides   = modal.querySelectorAll('.m-slide');
+    const dots     = modal.querySelectorAll('.m-dot');
+    const playBtn  = modal.querySelector('.m-playbtn');
+    const ring     = modal.querySelector('.m-ring-fg');
+    const RING_LEN = 72.26; // 2π·11.5
+    const INTERVAL = parseInt(modal.dataset.interval || '8000', 10);
+    let idx = 0;
+    let playing = true;
+    let rafId, startTs, elapsedAtPause = 0;
+
+    function go(next) {
+      if (next === idx) return;
+      const cur = slides[idx];
+      const nxt = slides[next];
+      cur.classList.remove('active');
+      cur.classList.add('exit-left');
+      nxt.classList.remove('exit-left');
+      // re-trigger any bar animations
+      nxt.querySelectorAll('.bar').forEach(b => {
+        b.style.animation = 'none';
+        void b.offsetWidth;
+        b.style.animation = '';
+      });
+      requestAnimationFrame(() => nxt.classList.add('active'));
+      setTimeout(() => cur.classList.remove('exit-left'), 600);
+      dots[idx].classList.remove('active');
+      dots[next].classList.add('active');
+      idx = next;
+      restartProgress();
+    }
+
+    function tickFrame(ts) {
+      if (!playing) return;
+      if (!startTs) startTs = ts - elapsedAtPause;
+      const elapsed = ts - startTs;
+      const pct = Math.min(elapsed / INTERVAL, 1);
+      ring.style.strokeDashoffset = (RING_LEN * (1 - pct)).toFixed(2);
+      if (pct >= 1) {
+        elapsedAtPause = 0;
+        startTs = 0;
+        go((idx + 1) % slides.length);
+        return;
+      }
+      rafId = requestAnimationFrame(tickFrame);
+    }
+
+    function restartProgress() {
+      cancelAnimationFrame(rafId);
+      elapsedAtPause = 0;
+      startTs = 0;
+      ring.style.strokeDashoffset = RING_LEN;
+      if (playing) rafId = requestAnimationFrame(tickFrame);
+    }
+
+    function setPlaying(p) {
+      playing = p;
+      if (p) {
+        playBtn.classList.remove('paused');
+        playBtn.setAttribute('aria-label', '일시정지');
+        startTs = 0;
+        rafId = requestAnimationFrame(tickFrame);
+      } else {
+        playBtn.classList.add('paused');
+        playBtn.setAttribute('aria-label', '재생');
+        cancelAnimationFrame(rafId);
+        const off = parseFloat(ring.style.strokeDashoffset || RING_LEN);
+        const pct = 1 - off / RING_LEN;
+        elapsedAtPause = pct * INTERVAL;
+      }
+    }
+
+    dots.forEach(d => d.addEventListener('click', () => go(parseInt(d.dataset.i, 10))));
+    playBtn.addEventListener('click', () => setPlaying(!playing));
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && playing) cancelAnimationFrame(rafId);
+      else if (!document.hidden && playing) { startTs = 0; rafId = requestAnimationFrame(tickFrame); }
+    });
+
+    restartProgress();
+  }
+  document.querySelectorAll('.modal').forEach(initCarousel);
+</script>
+</body>
+</html>
