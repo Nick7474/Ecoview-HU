@@ -42,6 +42,7 @@
       <main class="landing" data-page="home">
         <section class="map-stage" aria-label="광명 빅데이터 플랫폼 메인 지도">
           <img class="map-stage__bg" src="./img/Home 3D_Graphic.jpg" alt="광명시 3D 도시 지도" />
+          <div id="lottie-bg" class="map-stage__bg" style="z-index: 2;"></div>
 
           <div class="hero-copy" data-component="hero-copy">
             <h1>
@@ -860,6 +861,19 @@
       </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="./js/main.js"></script>
+    <script>
+      lottie.loadAnimation({
+        container: document.getElementById('lottie-bg'),
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: './Home_GM_ani.json',
+        rendererSettings: {
+          preserveAspectRatio: 'xMidYMid slice'
+        }
+      });
+    </script>
   </body>
 </html>
