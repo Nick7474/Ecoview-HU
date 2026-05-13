@@ -259,7 +259,7 @@
       if (modalTitle) modalTitle.textContent = info.name;
       if (modalSub) modalSub.textContent = info.subtitle;
       if (modalIconImg) modalIconImg.src = info.iconSvg;
-      if (modalIcon) modalIcon.style.background = accentInfo.gradient;
+      if (modalIcon) modalIcon.style.background = 'transparent';
       if (modal) modal.style.setProperty('--modal-accent', accentInfo.accent);
     } catch (e) {
       console.warn('[BI] Modal error:', e);
@@ -275,6 +275,20 @@
     setTimeout(function () {
       var target = document.elementFromPoint(lastPointer.x, lastPointer.y);
       var zone = target && target.closest ? target.closest('.bldg-zone') : null;
+      if (!zone) {
+        document.querySelectorAll('.bldg-zone').forEach(function (candidate) {
+          if (zone) return;
+          var rect = candidate.getBoundingClientRect();
+          if (
+            lastPointer.x >= rect.left &&
+            lastPointer.x <= rect.right &&
+            lastPointer.y >= rect.top &&
+            lastPointer.y <= rect.bottom
+          ) {
+            zone = candidate;
+          }
+        });
+      }
       if (!zone) return;
       var key = zone.dataset.building;
       var info = BUILDINGS[key];

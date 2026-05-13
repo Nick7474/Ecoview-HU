@@ -565,7 +565,7 @@ button {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 9;
+  z-index: 15;
   pointer-events: none;
   will-change: transform;
 }
@@ -3079,6 +3079,7 @@ button {
   pointer-events: all;
   cursor: pointer;
   overflow: visible;
+  background: rgba(255, 255, 255, 0);
   transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.4s ease, filter 0.4s ease;
   filter: none;
 }
@@ -3184,18 +3185,18 @@ button {
   height: 44px;
   display: grid;
   place-items: center;
-  color: #fff;
-  font-size: 20px;
-  border-radius: 13px;
-  background: linear-gradient(135deg, #0C8AE5cc, #0C8AE5);
-  box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--modal-accent) 45%, transparent);
+  color: inherit;
+  font-size: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
   flex-shrink: 0;
   overflow: hidden;
 }
 
 .bldg-modal__icon img {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 
