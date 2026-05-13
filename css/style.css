@@ -233,6 +233,17 @@ button {
   user-select: none;
 }
 
+.bldg-hover-img {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
 .hero-copy {
   position: absolute;
   top: 52px;
@@ -3098,10 +3109,6 @@ button {
 
 .bldg-zone[data-building="safety"]::before {
   inset: -54px -70px;
-}
-
-.bldg-zone > img {
-  z-index: 1;
 }
 
 /* ── Hover — polygon stays invisible, just for hit-detection ── */

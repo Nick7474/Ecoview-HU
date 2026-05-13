@@ -137,7 +137,7 @@
       var sz = 2 + Math.random() * 4;
       var ox = (Math.random() - 0.5) * r.width * 0.6;
       d.style.cssText =
-        'position:absolute;z-index:6;pointer-events:none;border-radius:50%;' +
+        'position:absolute;z-index:1;pointer-events:none;border-radius:50%;' +
         'left:' + (cx + ox) + 'px;top:' + (topY + Math.random() * r.height * 0.5) + 'px;' +
         'width:' + sz + 'px;height:' + sz + 'px;background:' + color + ';opacity:0;' +
         'box-shadow:0 0 ' + sz*3 + 'px ' + color + ';';
