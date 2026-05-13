@@ -117,6 +117,12 @@
 
   /* ── Particles ──────────────────── */
   var pTimer = null;
+  var lastPointer = { x: 0, y: 0 };
+
+  document.addEventListener('pointermove', function (event) {
+    lastPointer.x = event.clientX;
+    lastPointer.y = event.clientY;
+  }, { passive: true });
 
   function spawnParticles(zone, color) {
     var stage = document.querySelector('.map-stage');
@@ -266,6 +272,14 @@
     overlay.classList.remove('is-open');
     unlockScroll();
     stopHoverEffect();
+    setTimeout(function () {
+      var target = document.elementFromPoint(lastPointer.x, lastPointer.y);
+      var zone = target && target.closest ? target.closest('.bldg-zone') : null;
+      if (!zone) return;
+      var key = zone.dataset.building;
+      var info = BUILDINGS[key];
+      if (info) startHoverEffect(zone, key, info);
+    }, 80);
   }
 
   if (closeBtn) closeBtn.addEventListener('click', closeModal);

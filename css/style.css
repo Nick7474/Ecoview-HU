@@ -3078,8 +3078,29 @@ button {
   stroke-width: 0;
   pointer-events: all;
   cursor: pointer;
+  overflow: visible;
   transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.4s ease, filter 0.4s ease;
   filter: none;
+}
+
+.bldg-zone::before {
+  content: "";
+  position: absolute;
+  inset: -28px;
+  z-index: 0;
+  pointer-events: auto;
+}
+
+.bldg-zone[data-building="energy"]::before {
+  inset: -46px -62px;
+}
+
+.bldg-zone[data-building="safety"]::before {
+  inset: -54px -70px;
+}
+
+.bldg-zone > img {
+  z-index: 1;
 }
 
 /* ── Hover — polygon stays invisible, just for hit-detection ── */
@@ -3485,4 +3506,3 @@ button {
   color: #9AA1AC;
   font-weight: 500;
 }
-
