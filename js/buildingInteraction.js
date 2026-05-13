@@ -70,6 +70,28 @@
   var closeBtn  = overlay.querySelector('.bldg-modal__close');
   var backdrop  = overlay.querySelector('.bldg-modal-backdrop');
 
+  /* ── Scroll lock (prevents layout shift) ── */
+  var savedScrollY = 0;
+
+  function lockScroll() {
+    savedScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    // Use fixed positioning to prevent scrollbar disappearance layout shift
+    document.body.style.position = 'fixed';
+    document.body.style.top = '-' + savedScrollY + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function unlockScroll() {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, savedScrollY);
+  }
+
   /* ── Pulse state ────────────────── */
   var pulseId = null;
   var currentImg = null;
@@ -125,7 +147,7 @@
     }
   }
 
-  /* ── Start hover effect for a zone ── */
+  /* ── Start/stop hover effect ── */
   function startHoverEffect(zone, key, info) {
     var hoverImg = document.getElementById(info.hoverImgId);
     if (hoverImg) startPulse(hoverImg);
@@ -172,7 +194,6 @@
     html += '<div class="bss-header__title">BSS 배터리 교환 스테이션 현황</div>';
     html += '</div>';
 
-    // Summary bar
     html += '<div class="bss-summary">';
     html += '<div class="bss-summary__meta"><span class="bss-summary__count">총 <strong>' + BSS_DATA.length + '</strong>개소</span>';
     html += '<span class="bss-summary__avail">가용 배터리 <strong>' + totalAvail + '</strong> / ' + totalCap + '</span></div>';
@@ -180,11 +201,9 @@
     html += '<div class="bss-progress__pct">' + pct + '%</div>';
     html += '</div>';
 
-    // Station list
     html += '<div class="bss-list">';
     BSS_DATA.forEach(function(s) {
       var statusCls = s.status === 'active' ? 'bss-status--active' : 'bss-status--maint';
-      var statusTxt = s.status === 'active' ? '운영중' : '점검중';
       var batteryPct = Math.round(s.avail / s.total * 100);
 
       html += '<div class="bss-item">';
@@ -200,8 +219,7 @@
       html += '<div class="bss-item__swaps"><strong>' + s.swaps + '</strong><span>회/일</span></div>';
       html += '</div>';
     });
-    html += '</div>';
-    html += '</div>';
+    html += '</div></div>';
 
     return html;
   }
@@ -224,7 +242,6 @@
           });
         }
 
-        // Append BSS section for mobility
         if (key === 'mobility') {
           var bssHtml = buildBssSection();
           var bssContainer = document.createElement('div');
@@ -235,36 +252,20 @@
       }
       if (modalTitle) modalTitle.textContent = info.name;
       if (modalSub) modalSub.textContent = info.subtitle;
-      // Set SVG icon image
-      if (modalIconImg) {
-        modalIconImg.src = info.iconSvg;
-      }
-      if (modalIcon) {
-        modalIcon.style.background = accentInfo.gradient;
-      }
+      if (modalIconImg) modalIconImg.src = info.iconSvg;
+      if (modalIcon) modalIcon.style.background = accentInfo.gradient;
       if (modal) modal.style.setProperty('--modal-accent', accentInfo.accent);
     } catch (e) {
       console.warn('[BI] Modal error:', e);
     }
     overlay.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
   }
 
   function closeModal() {
     overlay.classList.remove('is-open');
-    document.body.style.overflow = '';
+    unlockScroll();
     stopHoverEffect();
-
-    // After overlay transition ends (~400ms), re-check if mouse is over any zone
-    setTimeout(function () {
-      document.querySelectorAll('.bldg-zone').forEach(function (zone) {
-        if (zone.matches(':hover')) {
-          var key = zone.dataset.building;
-          var info = BUILDINGS[key];
-          if (info) startHoverEffect(zone, key, info);
-        }
-      });
-    }, 450);
   }
 
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
