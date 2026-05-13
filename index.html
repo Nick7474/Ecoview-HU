@@ -44,6 +44,46 @@
           <img class="map-stage__bg" src="./img/Home 3D_Graphic.jpg" alt="광명시 3D 도시 지도" />
           <div id="lottie-bg" class="map-stage__bg" style="z-index: 2;"></div>
 
+          <!-- Energy Building Hitbox + Hover Image -->
+          <div class="bldg-zone" data-building="energy" 
+               style="position:absolute; z-index:5; cursor:pointer;
+                      left:45.1%; top:11.5%; width:11.7%; height:8.7%;">
+            <img id="hover-img-energy" src="./images/img_3.png" 
+                 style="position:absolute; top:0; left:0; width:100%; height:100%;
+                        object-fit:contain; opacity:0; pointer-events:none;
+                        transition: opacity 0.3s ease;" />
+          </div>
+
+          <!-- Mobility Building Hitbox + Hover Image -->
+          <div class="bldg-zone" data-building="mobility" 
+               style="position:absolute; z-index:5; cursor:pointer;
+                      left:56.5%; top:32.8%; width:12.5%; height:7.0%;">
+            <img id="hover-img-mobility" src="./images/img_0.png" 
+                 style="position:absolute; top:0; left:0; width:100%; height:100%;
+                        object-fit:contain; opacity:0; pointer-events:none;
+                        transition: opacity 0.3s ease;" />
+          </div>
+
+          <!-- Safety Building Hitbox + Hover Image -->
+          <div class="bldg-zone" data-building="safety" 
+               style="position:absolute; z-index:5; cursor:pointer;
+                      left:28.5%; top:41.0%; width:17.5%; height:9.5%;">
+            <img id="hover-img-safety" src="./images/img_1.png" 
+                 style="position:absolute; top:0; left:0; width:100%; height:100%;
+                        object-fit:contain; opacity:0; pointer-events:none;
+                        transition: opacity 0.3s ease;" />
+          </div>
+
+          <!-- Data Building Hitbox + Hover Image -->
+          <div class="bldg-zone" data-building="data" 
+               style="position:absolute; z-index:5; cursor:pointer;
+                      left:61.0%; top:43.0%; width:16.5%; height:12.5%;">
+            <img id="hover-img-data" src="./images/img_2.png" 
+                 style="position:absolute; top:0; left:0; width:100%; height:100%;
+                        object-fit:contain; opacity:0; pointer-events:none;
+                        transition: opacity 0.3s ease;" />
+          </div>
+
           <div class="hero-copy" data-component="hero-copy">
             <h1>
               <span>광명</span>
@@ -864,7 +904,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="./js/main.js"></script>
     <script>
-      lottie.loadAnimation({
+      window.lottieAnim = lottie.loadAnimation({
         container: document.getElementById('lottie-bg'),
         renderer: 'svg',
         loop: true,
@@ -875,5 +915,25 @@
         }
       });
     </script>
+
+    <!-- Building Modal Overlay -->
+    <div id="building-modal-overlay" class="bldg-modal-overlay">
+      <div class="bldg-modal-backdrop"></div>
+      <div class="bldg-modal" role="dialog" aria-modal="true">
+        <header class="bldg-modal__header">
+          <div class="bldg-modal__icon">⚡</div>
+          <div class="bldg-modal__title-wrap">
+            <h2 class="bldg-modal__title">에너지 마일</h2>
+            <p class="bldg-modal__subtitle">신재생에너지 생산 · 가상거래 현황</p>
+          </div>
+          <button class="bldg-modal__close" aria-label="닫기">✕</button>
+        </header>
+        <div class="bldg-modal__body">
+          <!-- Content cloned from mile-card via JS -->
+        </div>
+      </div>
+    </div>
+
+    <script src="./js/buildingInteraction.js"></script>
   </body>
 </html>

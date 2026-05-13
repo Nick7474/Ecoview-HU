@@ -3057,12 +3057,425 @@ button {
   top: calc(54.2% + 30px);
 }
 
-.modal-layer .modal.is-active {
-  transform: translateY(-8px);
-  box-shadow: 0 36px 72px -24px rgba(15, 30, 70, .26), 0 16px 30px -16px rgba(15, 30, 70, .18);
+
+/* ============================================================
+   BUILDING INTERACTION — Hover Glow + Click Modal
+   ============================================================ */
+
+/* ── Transparent SVG Hitbox Layer ── */
+.building-hitbox-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.modal-layer .modal:hover {
-  transform: translateY(-8px);
+.bldg-zone {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 0;
+  pointer-events: all;
+  cursor: pointer;
+  transition: fill 0.4s ease, stroke 0.4s ease, stroke-width 0.4s ease, filter 0.4s ease;
+  filter: none;
+}
+
+/* ── Hover — polygon stays invisible, just for hit-detection ── */
+.bldg-zone:hover {
+  fill: transparent;
+  stroke: transparent;
+}
+
+/* ── Floating Particle Dots (spawned by JS) ── */
+.bldg-particle-dot {
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+
+/* ============================================================
+   BUILDING MODAL OVERLAY
+   ============================================================ */
+.bldg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.bldg-modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.bldg-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 10, 20, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.bldg-modal {
+  --modal-accent: #0C8AE5;
+  position: relative;
+  width: 540px;
+  max-height: 82vh;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.30),
+              0 0 0 1px rgba(0, 0, 0, 0.04),
+              0 0 80px -20px color-mix(in srgb, var(--modal-accent) 20%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(40px) scale(0.94);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bldg-modal-overlay.is-open .bldg-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* ── Modal Header ── */
+.bldg-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #eceef2;
+}
+
+.bldg-modal__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 20px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #0C8AE5cc, #0C8AE5);
+  box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--modal-accent) 45%, transparent);
+  flex-shrink: 0;
+}
+
+.bldg-modal__title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.bldg-modal__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--modal-accent);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.bldg-modal__subtitle {
+  margin: 3px 0 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: #6B7280;
+  letter-spacing: -0.2px;
+}
+
+.bldg-modal__close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #9AA1AC;
+  font-size: 18px;
+  font-weight: 400;
+  border-radius: 50%;
+  background: #f4f5f7;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.bldg-modal__close:hover {
+  background: #e8eaee;
+  color: #333;
+  transform: rotate(90deg);
+}
+
+/* ── Modal Body ── */
+.bldg-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: #d0d5dc transparent;
+}
+
+.bldg-modal__body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.bldg-modal__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bldg-modal__body::-webkit-scrollbar-thumb {
+  background: #d0d5dc;
+  border-radius: 10px;
+}
+
+/* Re-style cloned content inside modal */
+.bldg-modal__body .stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.bldg-modal__body .stat-card {
+  background: #EDF4FC;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bldg-modal__body .stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0070C2;
+}
+
+.bldg-modal__body .chart-area {
+  height: 220px;
+}
+
+.bldg-modal__body .bar {
+  width: 32px;
+}
+
+.bldg-modal__body .detail-row {
+  padding: 11px 4px;
+}
+
+.bldg-modal__body .sect-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 16px 0 8px;
+}
+
+/* ============================================================
+   BSS (Battery Swapping Station) — Mobility Modal Section
+   ============================================================ */
+
+.bss-section {
+  margin-top: 4px;
+}
+
+.bss-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.bss-header__icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: #06A85B;
+  background: #E0F4E9;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.bss-header__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -0.3px;
+}
+
+/* Summary bar */
+.bss-summary {
+  background: linear-gradient(135deg, #f0fdf4, #e0f4e9);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.bss-summary__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.bss-summary__count {
+  font-size: 13px;
+  color: #333;
+}
+
+.bss-summary__count strong {
+  color: #06A85B;
+  font-weight: 700;
+}
+
+.bss-summary__avail {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.bss-summary__avail strong {
+  color: #06A85B;
+  font-weight: 700;
+}
+
+.bss-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bss-progress__bar {
+  height: 100%;
+  background: linear-gradient(90deg, #06A85B, #4ADE80);
+  border-radius: 99px;
+  transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.bss-progress__pct {
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  color: #06A85B;
+  margin-top: 4px;
+}
+
+/* Station list */
+.bss-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bss-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #FAFBFC;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.bss-item:hover {
+  background: #F0FAF4;
+  box-shadow: 0 2px 8px rgba(6, 168, 91, 0.08);
+}
+
+.bss-item__status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bss-status--active {
+  background: #06A85B;
+  box-shadow: 0 0 6px rgba(6, 168, 91, 0.4);
+}
+
+.bss-status--maint {
+  background: #F59E0B;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.bss-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bss-item__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+  letter-spacing: -0.2px;
+}
+
+.bss-item__addr {
+  font-size: 11px;
+  color: #9AA1AC;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bss-item__battery {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.bss-battery-bar {
+  width: 40px;
+  height: 6px;
+  background: #E5E7EB;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bss-battery-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #06A85B, #4ADE80);
+  border-radius: 99px;
+}
+
+.bss-battery-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  min-width: 30px;
+  text-align: right;
+}
+
+.bss-item__swaps {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 48px;
+  text-align: right;
+}
+
+.bss-item__swaps strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #06A85B;
+}
+
+.bss-item__swaps span {
+  font-size: 10px;
+  color: #9AA1AC;
+  font-weight: 500;
 }
 
