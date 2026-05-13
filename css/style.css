@@ -3169,6 +3169,13 @@ button {
   background: linear-gradient(135deg, #0C8AE5cc, #0C8AE5);
   box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--modal-accent) 45%, transparent);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.bldg-modal__icon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .bldg-modal__title-wrap {

@@ -11,7 +11,7 @@
       subtitle: '신재생에너지 생산 · 가상거래 현황',
       color: '#0C8AE5',
       particleColor: '#37EEFE',
-      icon: '⚡',
+      iconSvg: './img/00_E_O.svg',
       hoverImgId: 'hover-img-energy',
     },
     mobility: {
@@ -19,7 +19,7 @@
       subtitle: '친환경 이동 서비스 통합 운영 현황',
       color: '#06A85B',
       particleColor: '#37EEFE',
-      icon: '🚗',
+      iconSvg: './img/01_M_O.svg',
       hoverImgId: 'hover-img-mobility',
     },
     safety: {
@@ -27,7 +27,7 @@
       subtitle: 'AIoT 침수·홍수 통합관제 현황',
       color: '#EC8913',
       particleColor: '#37EEFE',
-      icon: '🛡️',
+      iconSvg: './img/02_S_O.svg',
       hoverImgId: 'hover-img-safety',
     },
     data: {
@@ -35,7 +35,7 @@
       subtitle: '탄소 거래·데이터 통합 플랫폼 현황',
       color: '#636CCC',
       particleColor: '#37EEFE',
-      icon: '📊',
+      iconSvg: './img/00_DM.svg',
       hoverImgId: 'hover-img-data',
     },
   };
@@ -66,6 +66,7 @@
   var modalTitle = overlay.querySelector('.bldg-modal__title');
   var modalSub  = overlay.querySelector('.bldg-modal__subtitle');
   var modalIcon = overlay.querySelector('.bldg-modal__icon');
+  var modalIconImg = document.getElementById('bldg-modal-icon-img');
   var closeBtn  = overlay.querySelector('.bldg-modal__close');
   var backdrop  = overlay.querySelector('.bldg-modal-backdrop');
 
@@ -74,6 +75,7 @@
   var currentImg = null;
 
   function startPulse(img) {
+    stopPulse(); // always clean up before starting new
     currentImg = img;
     currentImg.style.opacity = '1';
     var start = performance.now();
@@ -123,30 +125,37 @@
     }
   }
 
+  /* ── Start hover effect for a zone ── */
+  function startHoverEffect(zone, key, info) {
+    var hoverImg = document.getElementById(info.hoverImgId);
+    if (hoverImg) startPulse(hoverImg);
+    spawnParticles(zone, info.particleColor);
+    if (pTimer) clearInterval(pTimer);
+    pTimer = setInterval(function(){ spawnParticles(zone, info.particleColor); }, 1100);
+  }
+
+  function stopHoverEffect() {
+    stopPulse();
+    if (pTimer) { clearInterval(pTimer); pTimer = null; }
+  }
+
   /* ── Hover + Click on each building zone ── */
   document.querySelectorAll('.bldg-zone').forEach(function (zone) {
     var key = zone.dataset.building;
     var info = BUILDINGS[key];
     if (!info) return;
 
-    var hoverImg = document.getElementById(info.hoverImgId);
-
     zone.addEventListener('mouseenter', function () {
       if (overlay.classList.contains('is-open')) return;
-      if (hoverImg) startPulse(hoverImg);
-      spawnParticles(zone, info.particleColor);
-      pTimer = setInterval(function(){ spawnParticles(zone, info.particleColor); }, 1100);
+      startHoverEffect(zone, key, info);
     });
 
     zone.addEventListener('mouseleave', function () {
-      stopPulse();
-      if (pTimer) { clearInterval(pTimer); pTimer = null; }
+      stopHoverEffect();
     });
 
     zone.addEventListener('click', function () {
-      // Stop effects before opening modal
-      stopPulse();
-      if (pTimer) { clearInterval(pTimer); pTimer = null; }
+      stopHoverEffect();
       openModal(key, info);
     });
   });
@@ -226,8 +235,11 @@
       }
       if (modalTitle) modalTitle.textContent = info.name;
       if (modalSub) modalSub.textContent = info.subtitle;
+      // Set SVG icon image
+      if (modalIconImg) {
+        modalIconImg.src = info.iconSvg;
+      }
       if (modalIcon) {
-        modalIcon.textContent = info.icon;
         modalIcon.style.background = accentInfo.gradient;
       }
       if (modal) modal.style.setProperty('--modal-accent', accentInfo.accent);
@@ -241,8 +253,18 @@
   function closeModal() {
     overlay.classList.remove('is-open');
     document.body.style.overflow = '';
-    stopPulse();
-    if (pTimer) { clearInterval(pTimer); pTimer = null; }
+    stopHoverEffect();
+
+    // After overlay transition ends (~400ms), re-check if mouse is over any zone
+    setTimeout(function () {
+      document.querySelectorAll('.bldg-zone').forEach(function (zone) {
+        if (zone.matches(':hover')) {
+          var key = zone.dataset.building;
+          var info = BUILDINGS[key];
+          if (info) startHoverEffect(zone, key, info);
+        }
+      });
+    }, 450);
   }
 
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
